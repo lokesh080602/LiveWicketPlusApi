@@ -1,0 +1,136 @@
+.aclonica-regular {
+  font-family: "Aclonica", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+body {
+  font-family: "Aclonica", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9; 
+  color: #333;
+  text-align: center;
+}
+
+h1, h2 {
+  color: #FF69B4; /* Hot pink color for headers */
+}
+
+a {
+  color: #FF1493; /* Deep pink color for links */
+  text-decoration: none;
+  text-align: center;
+  margin-bottom:20px;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+h2 {
+  margin-top: 40px;
+}
+
+form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  text-align: left;
+  width: 100%;
+  max-width: 600px; /* Adjusted for larger forms */
+  margin-bottom: 30px;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin: 10px 0 5px;
+  color: #333; /* Dark text for better readability */
+}
+
+input[type="email"],
+input[type="password"],
+input[type="submit"],
+input[type="text"],
+input[type="number"] {
+  width: calc(100% - 16px);
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+input {
+  width: calc(100% - 16px);
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+input[type="submit"] {
+  background-color: #FF69B4; /* Hot pink color for submit button */
+  color: white; /* White text for contrast */
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left:10px;
+}
+
+input[type="submit"]:hover {
+  background-color: #FF1493; /* Deep pink on hover */
+}
+
+table {
+  width: 97%;
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: collapse;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+table th, table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+table th {
+  background-color: #FF69B4; /* Hot pink color for header background */
+  color: #fff; /* White text for contrast */
+  font-weight: bold;
+}
+
+table tr:nth-child(even) {
+  background-color: #FFE4E1; /* Misty rose color for alternating rows */
+}
+
+a.button {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 4px;
+  background-color: #FF69B4; /* Hot pink color for button */
+  color: white;
+  text-align: center;
+  margin-top: 20px;
+  text-decoration: none;
+}
+
+a.button:hover {
+  background-color: #FF1493; /* Deep pink on hover */
+}
