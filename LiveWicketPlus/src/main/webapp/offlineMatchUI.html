@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Match UI</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: 'Aclonica', sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #match-ui {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 400px;
+        }
+
+        h1, h3 {
+            color: #d9238c;
+        }
+
+        p, button {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #d9238c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #c71b7a;
+        }
+
+        #actions button {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        #this-over {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Match UI -->
+    <div id="match-ui">
+        <h1>Match: Team A vs Team B</h1>
+        <div>
+            <p><strong>Score: </strong> <span id="match-score">0</span>/<span id="match-wickets">0</span></p>
+            <p><strong>Overs: </strong> <span id="match-overs">0.0</span></p>
+            <p><strong>CRR: </strong> <span id="match-crr">0.00</span></p>
+        </div>
+
+        <div id="batsman-info">
+            <h3>Batsmen:</h3>
+            <p>Striker: <span id="striker-name">Batsman A</span> | Runs: <span id="striker-runs">0</span> | Balls: <span id="striker-balls">0</span></p>
+            <p>Non-Striker: <span id="non-striker-name">Batsman B</span> | Runs: <span id="non-striker-runs">0</span> | Balls: <span id="non-striker-balls">0</span></p>
+        </div>
+
+        <div id="bowler-info">
+            <h3>Bowler:</h3>
+            <p>Name: <span id="bowler-name">Bowler A</span> | Overs: <span id="bowler-overs">0.0</span> | Runs: <span id="bowler-runs">0</span> | Wickets: <span id="bowler-wickets">0</span></p>
+        </div>
+
+        <div id="actions">
+            <!-- Run buttons -->
+            <button onclick="addRun(0)">0</button>
+            <button onclick="addRun(1)">1</button>
+            <button onclick="addRun(2)">2</button>
+            <button onclick="addRun(3)">3</button>
+            <button onclick="addRun(4)">4</button>
+            <button onclick="addRun(5)">5</button>
+            <button onclick="addRun(6)">6</button>
+
+            <!-- Extras -->
+            <button onclick="addWide()">Wide</button>
+            <button onclick="addNoBall()">No Ball</button>
+            <button onclick="addBye()">Bye</button>
+            <button onclick="addLegBye()">Leg Bye</button>
+
+            <!-- Other actions -->
+            <button onclick="retireBatsman()">Retire</button>
+            <button onclick="swapBatsmen()">Swap Batsmen</button>
+            <button onclick="undo()">Undo</button>
+        </div>
+
+        <div id="this-over">
+            <h4>This Over:</h4>
+            <span id="over-update">-</span>
+        </div>
+    </div>
+
+    <script>
+        let totalRuns = 0;
+        let wickets = 0;
+        let oversBowled = 0;
+        let ballsBowled = 0;
+        let currentRunRate = 0;
+        let actionHistory = [];
+
+        let striker = { name: 'Batsman A', runs: 0, balls: 0 };
+        let nonStriker = { name: 'Batsman B', runs: 0, balls: 0 };
+        let bowler = { name: 'Bowler A', overs: 0, runs: 0, wickets: 0 };
+
+        function addRun(run) {
+            actionHistory.push({
+                type: 'run',
+                run: run,
+                totalRuns: totalRuns,
+                ballsBowled: ballsBowled,
+                oversBowled: oversBowled,
+                striker: { ...striker },
+                nonStriker: { ...nonStriker }
+            });
+
+            totalRuns += run;
+            ballsBowled++;
+            striker.runs += run;
+            striker.balls++;
+
+            if (run % 2 !== 0) {
+                swapBatsmen();
+            }
+
+            updateUI();
+
+            if (ballsBowled % 6 === 0) {
+                oversBowled++;
+                ballsBowled = 0;
+                newOver();
+            }
+        }
+
+        function swapBatsmen() {
+            let temp = striker;
+            striker = nonStriker;
+            nonStriker = temp;
+            updateUI();
+        }
+
+        function addWide() {
+            totalRuns++;
+            updateUI();
+        }
+
+        function addNoBall() {
+            totalRuns++;
+            updateUI();
+        }
+
+        function addBye() {
+            totalRuns++;
+            ballsBowled++;
+            updateUI();
+        }
+
+        function addLegBye() {
+            totalRuns++;
+            ballsBowled++;
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('match-score').textContent = totalRuns;
+            document.getElementById('striker-name').textContent = striker.name;
+            document.getElementById('striker-runs').textContent = striker.runs;
+            document.getElementById('striker-balls').textContent = striker.balls;
+            document.getElementById('match-overs').textContent = `${oversBowled}.${ballsBowled}`;
+            document.getElementById('non-striker-name').textContent = nonStriker.name;
+            document.getElementById('non-striker-runs').textContent = nonStriker.runs;
+            document.getElementById('non-striker-balls').textContent = nonStriker.balls;
+
+            currentRunRate = (totalRuns / (oversBowled + ballsBowled / 6)).toFixed(2);
+            document.getElementById('match-crr').textContent = currentRunRate;
+        }
+
+        function retireBatsman() {
+            alert(striker.name + " is retired");
+
+            striker = nonStriker;
+            nonStriker = { name: 'New Batsman', runs: 0, balls: 0 };
+
+            updateUI();
+        }
+
+        function undo() {
+            if (actionHistory.length > 0) {
+                const lastAction = actionHistory.pop();
+
+                totalRuns = lastAction.totalRuns;
+                ballsBowled = lastAction.ballsBowled;
+                oversBowled = lastAction.oversBowled;
+                striker = lastAction.striker;
+                nonStriker = lastAction.nonStriker;
+
+                updateUI();
+            } else {
+                alert('No actions to undo');
+            }
+        }
+
+        function newOver() {
+            document.getElementById('over-update').textContent = 'New Over Started';
+            bowler.overs++;
+            updateUI();
+        }
+    </script>
+</body>
+</html>

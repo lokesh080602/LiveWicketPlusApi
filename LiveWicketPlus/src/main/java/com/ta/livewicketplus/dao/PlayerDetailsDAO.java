@@ -5,6 +5,8 @@ import com.ta.livewicketplus.util.JPAUtil;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
 import java.util.List;
 
 public class PlayerDetailsDAO {
@@ -60,6 +62,21 @@ public class PlayerDetailsDAO {
 		} finally {
 			em.close();
 		}
+	}
+	public PlayerDetails getPlayerByNameAndTeamAndRole(String name, String team, String role) {
+	    EntityManager em = JPAUtil.getEntityManager();
+	    try {
+	        // Assuming a JPQL query to find the player
+	        String query = "SELECT p FROM PlayerDetails p WHERE p.name = :name AND p.team = :team AND p.role = :role";
+	        TypedQuery<PlayerDetails> typedQuery = em.createQuery(query, PlayerDetails.class);
+	        typedQuery.setParameter("name", name);
+	        typedQuery.setParameter("team", team);
+	        typedQuery.setParameter("role", role);
+	        List<PlayerDetails> results = typedQuery.getResultList();
+	        return results.isEmpty() ? null : results.get(0); // Return the first matching player, if any
+	    } finally {
+	        em.close();
+	    }
 	}
 
 	@FunctionalInterface

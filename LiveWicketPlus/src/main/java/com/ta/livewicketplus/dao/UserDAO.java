@@ -52,17 +52,17 @@ public class UserDAO {
             em.close();
         }
     }
-
     public User getUserById(long userId) {
         EntityManager em = JPAUtil.getEntityManager();
-        User user = em.find(User.class, userId);
+        User user = em.find(User.class, userId); // Find the user with the provided ID
         try {
-            Hibernate.initialize(user.getFavoriteTeams());
-            Hibernate.initialize(user.getFavoritePlayers());
-        
-            return user;
+            if (user != null) {             
+                Hibernate.initialize(user.getFavoriteTeams());
+                Hibernate.initialize(user.getFavoritePlayers());
+            }
+            return user; 
         } finally {
-            em.close();
+            em.close(); 
         }
     }
 

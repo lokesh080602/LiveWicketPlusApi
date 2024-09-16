@@ -1,23 +1,16 @@
 package com.ta.livewicketplus.dto;
 
+import java.util.Date;
 import java.util.List;
+import javax.persistence.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 @Entity
-@Table(name = "match")
+@Table(name = "matchs")
 public class Match {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long matchId;
 
     @Column(name = "teamA")
     private String teamA;
@@ -31,20 +24,40 @@ public class Match {
     @Column(name = "scoreTeamB")
     private int scoreTeamB;
 
+    @Column(name = "toss_winner")
+    private String tossWinner;
+
+    @Column(name = "opted_to")
+    private String optedTo;
+
+    @Column(name = "overs")
+    private int overs;
+
+    @Column(name = "venue")
+    private String venue;
+
+    @Column(name = "match_date")
+    @Temporal(TemporalType.DATE)
+    private Date matchDate;
+
+    @Column(name = "umpires")
+    private String umpires;
+
     @OneToMany
     @JoinTable(
-        name = "match_playerdetails",
+        name = "matchs_playerdetails",
         joinColumns = @JoinColumn(name = "match_id"),
         inverseJoinColumns = @JoinColumn(name = "player_id")
     )
     private List<PlayerDetails> playerDetailsList;
 
-    public Long getMatchId() {
-        return id;
+    // Getters and Setters
+    public Long getId() {
+        return matchId;
     }
 
-    public void setMatchId(Long matchId) {
-        this.id = matchId;
+    public void setId(Long matchId) {
+        this.matchId = matchId;
     }
 
     public String getTeamA() {
@@ -63,20 +76,68 @@ public class Match {
         this.teamB = teamB;
     }
 
-    public Integer getScoreTeamA() {
+    public int getScoreTeamA() {
         return scoreTeamA;
     }
 
-    public void setScoreTeamA(Integer scoreTeamA) {
+    public void setScoreTeamA(int scoreTeamA) {
         this.scoreTeamA = scoreTeamA;
     }
 
-    public Integer getScoreTeamB() {
+    public int getScoreTeamB() {
         return scoreTeamB;
     }
 
-    public void setScoreTeamB(Integer scoreTeamB) {
+    public void setScoreTeamB(int scoreTeamB) {
         this.scoreTeamB = scoreTeamB;
+    }
+
+    public String getTossWinner() {
+        return tossWinner;
+    }
+
+    public void setTossWinner(String tossWinner) {
+        this.tossWinner = tossWinner;
+    }
+
+    public String getOptedTo() {
+        return optedTo;
+    }
+
+    public void setOptedTo(String optedTo) {
+        this.optedTo = optedTo;
+    }
+
+    public int getOvers() {
+        return overs;
+    }
+
+    public void setOvers(int overs) {
+        this.overs = overs;
+    }
+
+    public String getVenue() {
+        return venue;
+    }
+
+    public void setVenue(String venue) {
+        this.venue = venue;
+    }
+
+    public Date getMatchDate() {
+        return matchDate;
+    }
+
+    public void setMatchDate(Date matchDate) {
+        this.matchDate = matchDate;
+    }
+
+    public String getUmpires() {
+        return umpires;
+    }
+
+    public void setUmpires(String umpires) {
+        this.umpires = umpires;
     }
 
     public List<PlayerDetails> getPlayerDetailsList() {
@@ -84,17 +145,6 @@ public class Match {
     }
 
     public void setPlayerDetailsList(List<PlayerDetails> playerDetailsList) {
-        this.playerDetailsList = playerDetailsList;
-    }
-
-    public Match() {}
-
-    public Match(Long matchId, String teamA, String teamB, Integer scoreTeamA, Integer scoreTeamB, List<PlayerDetails> playerDetailsList) {
-        this.id = matchId;
-        this.teamA = teamA;
-        this.teamB = teamB;
-        this.scoreTeamA = scoreTeamA;
-        this.scoreTeamB = scoreTeamB;
         this.playerDetailsList = playerDetailsList;
     }
 }

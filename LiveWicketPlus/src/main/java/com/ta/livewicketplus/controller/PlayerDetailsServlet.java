@@ -125,11 +125,13 @@ public class PlayerDetailsServlet extends HttpServlet {
 
     private void viewPlayer(HttpServletRequest request, HttpServletResponse response, ResponseStructure<PlayerDetails> responseStructure)
             throws IOException {
-        String idParam = json.getString("playerId");
+        String idParam = String.valueOf(json.getInt("playerId"));
+        
         if (idParam != null && !idParam.isEmpty()) {
-            try {
-                int id = Integer.parseInt(idParam);
-                PlayerDetails player = playerService.getPlayerDetails(id);
+            try {        
+            	int id = Integer.parseInt(idParam);
+            	PlayerDetails player = playerService.getPlayerDetails(id);
+
                 if (player != null) {
                     responseStructure.setStatus(HttpServletResponse.SC_OK);
                     responseStructure.setMessage("Player details retrieved successfully.");

@@ -1,228 +1,217 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@page import="com.ta.livewicketplus.dto.PlayerDetails"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@page import="com.ta.livewicketplus.controller.*"%>
+<%@page import="java.util.*" %>
+<%@page import="com.ta.livewicketplus.service.*" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offline Cricket Score</title>
-  <style>/* General styles for the body */
-body {
-    font-family: 'Aclonica', sans-serif;
-    background-color: #f0f0f0;
-    color: #333;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
+    <style>
+        /* Your existing CSS styles */
+        .toss label {
+            margin-right: 10px; 
+            margin-bottom: 3px;
+        }
 
-/* Container for the form and UI */
-#start-match-form, #select-players-form, #match-ui {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    width: 300px;
-    margin-top: 20px;
-}
+        .toss-options {
+            display: flex;
+            gap: 3px;
+            align-items: center;
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+        body {
+            font-family: 'Aclonica', sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-/* Headings */
-h2 {
-    color: #d9238c;
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 20px;
-}
+        #main-container {
+            display: flex;
+            flex-direction: row; /* Row layout for double columns */
+            gap: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            width: 100%;
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
 
-/* Form labels */
-label {
-    display: block;
-    font-size: 16px;
-    margin-bottom: 5px;
-}
+        .form-container {
+            flex: 1; /* Make each form take up equal space */
+            padding: 20px;
+            background-color: #fafafa;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
 
-/* Form input fields */
-input[type="text"], input[type="number"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-}
+        h2 {
+            color: #d9238c;
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
 
-/* Radio buttons */
-input[type="radio"] {
-    margin-right: 5px;
-}
+        label {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
 
-/* Buttons */
-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #d9238c;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
 
-button:hover {
-    background-color: #c71b7a;
-}
+        input[type="radio"] {
+            margin-right: 5px;
+        }
 
-/* Tables */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #d9238c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-table thead th {
-    background-color: #d9238c;
-    color: white;
-    padding: 10px;
-}
+        button:hover {
+            background-color: #c71b7a;
+        }
 
-table tbody td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    #start-match-form, #select-players-form, #match-ui {
-        width: 100%;
-        padding: 15px;
-    }
-
-    h2 {
-        font-size: 20px;
-    }
-
-    button {
-        font-size: 14px;
-    }
-}
-  </style>
+        @media (max-width: 768px) {
+            #main-container {
+                flex-direction: column; /* Stack forms vertically on small screens */
+                padding: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Team, Toss, Overs Form -->
-    <div id="start-match-form">
-        <h2>Match Setup</h2>
-        <form id="matchSetupForm">
-            <label for="teamA">Team A:</label>
-            <input type="text" id="teamA" required><br>
+    <div id="main-container">
+        <!-- Match Setup Form -->
+        <div class="form-container">
+            <h2>Match Setup</h2>
+            <form id="matchSetupForm">
+                <label for="teamA">Team A:</label>
+                <input type="text" id="teamA" required><br>
 
-            <label for="teamB">Team B:</label>
-            <input type="text" id="teamB" required><br>
+                <label for="teamB">Team B:</label>
+                <input type="text" id="teamB" required><br>
 
-            <lable for="toss">Toss Won By:</lable>
-            <input type="radio" id="toss" name="tossWinner" value="teamA" required>Team A
-            <input type="radio" id="toss" name="tossWinner" value="teamB" required> Team B
-        
+                <div class="toss">
+                    <label>Toss Won By:</label>
+                    <div class="toss-options">
+                        <input type="radio" id="tossA" name="tossWinner" value="Team A" required> Team A
+                        <input type="radio" id="tossB" name="tossWinner" value="Team B" required> Team B
+                    </div>
+                </div>
 
-            <p>Opted To:</p>
-            <lable for="opted">Opted To:</lable>
-            <input type="radio" id="opted" name="optedTo" value="bat" required>Bat
-          
-            <input type="radio" id="opted" name="optedTo" value="bowl" required>Bowl<br>
-       
+                <div class="toss">
+                    <label>Opted To:</label>
+                    <div class="toss-options">
+                        <input type="radio" id="optedBat" name="optedTo" value="Bat" required> Bat
+                        <input type="radio" id="optedBowl" name="optedTo" value="Bowl" required> Bowl
+                    </div>
+                </div>
 
-            <label for="overs">Overs:</label>
-            <input type="number" id="overs" required><br>
+                <label for="overs">Overs:</label>
+                <input type="number" id="overs" required><br>
+            </form>
+        </div>
 
-            <button type="button" onclick="navigateToPlayers()">Start Match</button>
-        </form>
-    </div>
+        <!-- Player Selection Form -->
+        <div class="form-container">
+            <h2>Select Opening Players</h2>
+            <form id="playersForm">
+                <label for="strikerSelect">Striker:</label>
+                <select id="strikerSelect" onchange="updatePlayer('striker', this.value, this.options[this.selectedIndex].text)">
+                    <option value="">Select a player</option>
+                    <% 
+                        PlayerService playerService = new PlayerService();
+                        List<PlayerDetails> players = playerService.getAllPlayerDetails();
+                        for (PlayerDetails player : players) {
+                    %>
+                    <option value="<%= player.getPlayerId() %>"><%= player.getName() %> <%= player.getTeam() %></option>
+                    <% 
+                        }
+                    %>
+                </select><br>
 
-    <!-- Select Opening Players Form -->
-    <div id="select-players-form" style="display:none;">
-        <h2>Select Opening Players</h2>
-        <form id="playersForm">
-            <label for="striker">Striker:</label>
-            <input type="text" id="striker" required><br>
+                <label for="nonStrikerSelect">Non-Striker:</label>
+                <select id="nonStrikerSelect" onchange="updatePlayer('nonStriker', this.value, this.options[this.selectedIndex].text)">
+                    <option value="">Select a player</option>
+                    <% 
+                        for (PlayerDetails player : players) {
+                    %>
+                    <option value="<%= player.getPlayerId() %>"><%= player.getName() %> <%= player.getTeam() %></option>
+                    <% 
+                        }
+                    %>
+                </select><br>
 
-            <label for="nonStriker">Non-Striker:</label>
-            <input type="text" id="nonStriker" required><br>
+                <label for="openingBowlerSelect">Opening Bowler:</label>
+                <select id="openingBowlerSelect" onchange="updatePlayer('openingBowler', this.value, this.options[this.selectedIndex].text)">
+                    <option value="">Select a bowler</option>
+                    <% 
+                        for (PlayerDetails player : players) {
+                    %>
+                    <option value="<%= player.getPlayerId() %>"><%= player.getName() %> <%= player.getTeam() %></option>
+                    <% 
+                        }
+                    %>
+                </select><br>
 
-            <label for="openingBowler">Opening Bowler:</label>
-            <input type="text" id="openingBowler" required><br>
-
-            <button type="button" onclick="startMatch()">Start Match</button>
-        </form>
-    </div>
-
-    <!-- Match UI -->
-    <div id="match-ui" style="display:none;">
-        <h2 id="match-heading">Match: </h2>
-        <p id="toss-info"></p>
-        <p id="score-info">0 - 0 (0.0)</p>
-        <div id="batsman-info">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Batsman</th>
-                        <th>R</th>
-                        <th>B</th>
-                        <th>4s</th>
-                        <th>6s</th>
-                        <th>SR</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td id="striker-info"></td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0.00</td>
-                    </tr>
-                    <tr>
-                        <td id="nonStriker-info"></td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0.00</td>
-                    </tr>
-                </tbody>
-            </table>
+                <button type="button" onclick="submitMatchSetup()">Start Match</button>
+            </form>
         </div>
     </div>
 
     <script>
-        function navigateToPlayers() {
-            document.getElementById('start-match-form').style.display = 'none';
-            document.getElementById('select-players-form').style.display = 'block';
+        function updatePlayer(role, playerId, playerName) {
+            console.log(`${role} selected: ${playerName} (ID: ${playerId})`);
         }
 
-        function startMatch() {
-            // Get the values from forms
-            const teamA = document.getElementById('teamA').value;
-            const teamB = document.getElementById('teamB').value;
-            const striker = document.getElementById('striker').value;
-            const nonStriker = document.getElementById('nonStriker').value;
-            const openingBowler = document.getElementById('openingBowler').value;
-            const tossWinner = document.querySelector('input[name="tossWinner"]:checked').nextSibling.textContent;
-            const optedTo = document.querySelector('input[name="optedTo"]:checked').nextSibling.textContent;
+        function submitMatchSetup() {
+            var matchSetupForm = document.getElementById('matchSetupForm');
+            var playersForm = document.getElementById('playersForm');
+            var formData = new FormData(matchSetupForm);
+            var playersData = new FormData(playersForm);
 
-            // Set match UI details
-            document.getElementById('match-heading').textContent = `${teamA} vs ${teamB}`;
-            document.getElementById('toss-info').textContent = `Toss won by ${tossWinner} and opted to ${optedTo}`;
-            document.getElementById('striker-info').textContent = striker;
-            document.getElementById('nonStriker-info').textContent = nonStriker;
+            formData.append('striker', playersData.get('striker'));
+            formData.append('nonStriker', playersData.get('nonStriker'));
+            formData.append('openingBowler', playersData.get('openingBowler'));
 
-            // Hide player form and show match UI
-            document.getElementById('select-players-form').style.display = 'none';
-            document.getElementById('match-ui').style.display = 'block';
+            fetch('MatchServlet', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.text())
+              .then(result => {
+                  console.log(result);
+                  alert('Match setup completed successfully!');
+              }).catch(error => {
+                  console.error('Error:', error);
+              });
         }
     </script>
 </body>

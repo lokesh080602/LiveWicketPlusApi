@@ -1,13 +1,9 @@
 package com.ta.livewicketplus.util;
-
-import java.util.List;
-
-
 public class ResponseStructure<T> {
 
     private int status;
     private String message;
-    private T data; // Changed from Object to generic type T
+    private T data; 
 
     public int getStatus() {
         return status;

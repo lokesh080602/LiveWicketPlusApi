@@ -1,5 +1,6 @@
 package com.ta.livewicketplus.controller;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ta.livewicketplus.dto.Match;
@@ -27,12 +30,23 @@ public class MatchServlet extends HttpServlet {
     private final MatchService matchService = new MatchService();
     private final PlayerService playerService = new PlayerService();
     private final ObjectMapper objectMapper = new ObjectMapper();
-
+    private JSONObject json;
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String action = request.getParameter("action");
-        String matchId = request.getParameter("matchId");
+    	BufferedReader reader=request.getReader();
+    	StringBuilder  builder=new StringBuilder();
+    	String line;
+    	while((line=reader.readLine())!=null) {
+    		
+    		builder.append(line);
+    	}
+
+    		json=new JSONObject(builder.toString());
+	
+    	String action=json.getString("action");
+
+        String matchId = json.getString("matchId");
 
         try {
             if ("list".equals(action)) {
@@ -40,7 +54,7 @@ public class MatchServlet extends HttpServlet {
             } else if ("view".equals(action) && matchId != null) {
                 viewMatch(request, response, matchId);
             } else if ("edit".equals(action) && matchId != null) {
-                editMatch(request, response, matchId);
+                editMatch(response, matchId);
             } else {
                 logger.warn("Invalid action or match ID not provided.");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -56,7 +70,17 @@ public class MatchServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String action = request.getParameter("action");
+    	BufferedReader reader=request.getReader();
+    	StringBuilder  builder=new StringBuilder();
+    	String line;
+    	while((line=reader.readLine())!=null) {
+    		
+    		builder.append(line);
+    	}
+
+    		json=new JSONObject(builder.toString());
+	
+    	String action=json.getString("action");
         logger.info("Action received: {}", action);
 
         try {
@@ -100,7 +124,7 @@ public class MatchServlet extends HttpServlet {
     private void viewMatch(HttpServletRequest request, HttpServletResponse response, String matchId) throws IOException {
         ResponseStructure<Match> responseStructure = new ResponseStructure<>();
         try {
-            int id = Integer.parseInt(matchId);
+            int id =json.getInt(matchId);
             Match match = matchService.getMatchDetails(id);
             if (match != null) {
                 responseStructure.setStatus(HttpServletResponse.SC_OK);
@@ -127,13 +151,12 @@ public class MatchServlet extends HttpServlet {
         }
     }
 
-    private void editMatch(HttpServletRequest request, HttpServletResponse response, String matchId) throws IOException {
+    private void editMatch(HttpServletResponse response, String matchId) throws IOException {
         ResponseStructure<Match> responseStructure = new ResponseStructure<>();
         try {
-            int id = Integer.parseInt(matchId);
+            int id = json.getInt(matchId);
             Match match = matchService.getMatchDetails(id);
             if (match != null) {
-                List<PlayerDetails> players = matchService.getPlayersByMatchId(match.getMatchId());
                 responseStructure.setStatus(HttpServletResponse.SC_OK);
                 responseStructure.setMessage("Match details retrieved for editing.");
                 responseStructure.setData(match);
@@ -164,15 +187,17 @@ public class MatchServlet extends HttpServlet {
         ResponseStructure<String> responseStructure = new ResponseStructure<>();
         try {
             Match match = new Match();
-            match.setTeamA(request.getParameter("teamA"));
-            match.setTeamB(request.getParameter("teamB"));
-            match.setScoreTeamA(Integer.parseInt(request.getParameter("scoreTeamA").trim()));
-            match.setScoreTeamB(Integer.parseInt(request.getParameter("scoreTeamB").trim()));
+            match.setTeamA(json.getString("teamA"));
+            match.setTeamB(json.getString("teamB"));
+            match.setScoreTeamA(json.getInt("scoreTeamA"));
+            match.setScoreTeamB(json.getInt("scoreTeamB"));
 
-            String[] playerIds = request.getParameterValues("players[]");
-            if (playerIds != null) {
+            // Get player IDs from the JSON object
+            JSONArray playerIdsArray = json.getJSONArray("players");
+            if (playerIdsArray != null) {
                 List<PlayerDetails> playerDetailsList = new ArrayList<>();
-                for (String playerId : playerIds) {
+                for (int i = 0; i < playerIdsArray.length(); i++) {
+                    String playerId = playerIdsArray.getString(i);
                     PlayerDetails player = playerService.getPlayerDetails(Integer.parseInt(playerId));
                     if (player != null) {
                         playerDetailsList.add(player);
@@ -207,10 +232,10 @@ public class MatchServlet extends HttpServlet {
             int matchId = Integer.parseInt(request.getParameter("matchId"));
             Match match = matchService.getMatchDetails(matchId);
             if (match != null) {
-                match.setTeamA(request.getParameter("teamA"));
-                match.setTeamB(request.getParameter("teamB"));
-                match.setScoreTeamA(Integer.parseInt(request.getParameter("scoreTeamA")));
-                match.setScoreTeamB(Integer.parseInt(request.getParameter("scoreTeamB")));
+                match.setTeamA(json.getString("teamA"));
+                match.setTeamB(json.getString("teamB"));
+                match.setScoreTeamA(json.getInt("scoreTeamA"));
+                match.setScoreTeamB(json.getInt("scoreTeamB"));
                 matchService.updateMatch(match);
                 responseStructure.setStatus(HttpServletResponse.SC_OK);
                 responseStructure.setMessage("Match updated successfully.");
@@ -241,7 +266,7 @@ public class MatchServlet extends HttpServlet {
     private void deleteMatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ResponseStructure<String> responseStructure = new ResponseStructure<>();
         try {
-            int matchId = Integer.parseInt(request.getParameter("matchId"));
+            int matchId =json.getInt("matchId");
             matchService.deleteMatch(matchId);
             responseStructure.setStatus(HttpServletResponse.SC_OK);
             responseStructure.setMessage("Match deleted successfully.");
